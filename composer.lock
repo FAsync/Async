@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FAsync/EventLoop.git",
-                "reference": "219619cccf4e8da3eec8f96384beca5f85cb0959"
+                "reference": "a2ae7d20c14d95e801d8a5965d279c23f132d223"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FAsync/EventLoop/zipball/219619cccf4e8da3eec8f96384beca5f85cb0959",
-                "reference": "219619cccf4e8da3eec8f96384beca5f85cb0959",
+                "url": "https://api.github.com/repos/FAsync/EventLoop/zipball/a2ae7d20c14d95e801d8a5965d279c23f132d223",
+                "reference": "a2ae7d20c14d95e801d8a5965d279c23f132d223",
                 "shasum": ""
             },
             "require": {
@@ -47,7 +47,7 @@
                 "issues": "https://github.com/FAsync/EventLoop/issues",
                 "source": "https://github.com/FAsync/EventLoop/tree/main"
             },
-            "time": "2025-09-06T05:17:43+00:00"
+            "time": "2025-09-06T07:07:01+00:00"
         },
         {
             "name": "fasync/promise",
@@ -55,15 +55,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FAsync/Promise.git",
-                "reference": "0f45a65aea2045cacfb3ebffc174cc5f907904a9"
+                "reference": "22e41d18b602bb6ad341a213b212a74fef9e4303"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FAsync/Promise/zipball/0f45a65aea2045cacfb3ebffc174cc5f907904a9",
-                "reference": "0f45a65aea2045cacfb3ebffc174cc5f907904a9",
+                "url": "https://api.github.com/repos/FAsync/Promise/zipball/22e41d18b602bb6ad341a213b212a74fef9e4303",
+                "reference": "22e41d18b602bb6ad341a213b212a74fef9e4303",
                 "shasum": ""
             },
             "require": {
+                "fasync/async": "dev-main",
+                "fasync/event-loop": "dev-main",
                 "php": "^8.2"
             },
             "require-dev": {
@@ -95,7 +97,7 @@
                 "issues": "https://github.com/FAsync/Promise/issues",
                 "source": "https://github.com/FAsync/Promise/tree/main"
             },
-            "time": "2025-09-06T05:17:28+00:00"
+            "time": "2025-09-06T07:06:49+00:00"
         }
     ],
     "packages-dev": [
