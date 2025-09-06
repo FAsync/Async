@@ -17,8 +17,10 @@
             "name": "Reymart A. Calicdan"
         }
     ],
-     "require": {
-        "php": "^8.2"
+    "require": {
+        "php": "^8.2",
+        "fasync/event-loop": "dev-main",
+        "fasync/promise": "dev-main"
     },
     "require-dev": {
         "pestphp/pest": "^4.0"

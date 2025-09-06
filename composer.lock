@@ -4,8 +4,100 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d74bd04bec451c84ceebc29fdc997b5d",
-    "packages": [],
+    "content-hash": "4b0167abd678472417014a087d08392e",
+    "packages": [
+        {
+            "name": "fasync/event-loop",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FAsync/EventLoop.git",
+                "reference": "219619cccf4e8da3eec8f96384beca5f85cb0959"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FAsync/EventLoop/zipball/219619cccf4e8da3eec8f96384beca5f85cb0959",
+                "reference": "219619cccf4e8da3eec8f96384beca5f85cb0959",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "pestphp/pest": "^4.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Fasync\\EventLoop\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Reymart A. Calicdan"
+                }
+            ],
+            "description": "Fiber native eventloop for building block for heart of fasync libraries",
+            "support": {
+                "issues": "https://github.com/FAsync/EventLoop/issues",
+                "source": "https://github.com/FAsync/EventLoop/tree/main"
+            },
+            "time": "2025-09-06T05:17:43+00:00"
+        },
+        {
+            "name": "fasync/promise",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FAsync/Promise.git",
+                "reference": "0f45a65aea2045cacfb3ebffc174cc5f907904a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FAsync/Promise/zipball/0f45a65aea2045cacfb3ebffc174cc5f907904a9",
+                "reference": "0f45a65aea2045cacfb3ebffc174cc5f907904a9",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "pestphp/pest": "^4.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/Helpers/global_functions.php",
+                    "src/Helpers/namespace_functions.php"
+                ],
+                "psr-4": {
+                    "Fasync\\Promise\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Reymart A. Calicdan",
+                    "email": "reymart.calicdan06@gmail.com"
+                }
+            ],
+            "description": "Promise A+ implementation with cancellation support",
+            "support": {
+                "issues": "https://github.com/FAsync/Promise/issues",
+                "source": "https://github.com/FAsync/Promise/tree/main"
+            },
+            "time": "2025-09-06T05:17:28+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "brianium/paratest",
@@ -3868,10 +3960,15 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "fasync/event-loop": 20,
+        "fasync/promise": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
+    "platform": {
+        "php": "^8.2"
+    },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
