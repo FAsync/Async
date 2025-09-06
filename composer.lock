@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4b0167abd678472417014a087d08392e",
+    "content-hash": "3a4d967b98ed38d10b74c60bfc47315d",
     "packages": [
         {
-            "name": "fasync/event-loop",
+            "name": "hiblaphp/event-loop",
             "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/FAsync/EventLoop.git",
-                "reference": "a2ae7d20c14d95e801d8a5965d279c23f132d223"
+                "url": "https://github.com/hiblaphp/event-loop.git",
+                "reference": "850e7aeecb4d85b4baf215e83cf7e4aab1867c09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FAsync/EventLoop/zipball/a2ae7d20c14d95e801d8a5965d279c23f132d223",
-                "reference": "a2ae7d20c14d95e801d8a5965d279c23f132d223",
+                "url": "https://api.github.com/repos/hiblaphp/event-loop/zipball/850e7aeecb4d85b4baf215e83cf7e4aab1867c09",
+                "reference": "850e7aeecb4d85b4baf215e83cf7e4aab1867c09",
                 "shasum": ""
             },
             "require": {
@@ -26,11 +26,14 @@
             "require-dev": {
                 "pestphp/pest": "^4.0"
             },
+            "suggest": {
+                "ext-uv": "More performant event loop using libuv instead of streams"
+            },
             "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Fasync\\EventLoop\\": "src/"
+                    "Hibla\\EventLoop\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -42,33 +45,34 @@
                     "name": "Reymart A. Calicdan"
                 }
             ],
-            "description": "Fiber native eventloop for building block for heart of fasync libraries",
+            "description": "Fiber native eventloop for building block for heart of hiblaphp libraries",
             "support": {
-                "issues": "https://github.com/FAsync/EventLoop/issues",
-                "source": "https://github.com/FAsync/EventLoop/tree/main"
+                "issues": "https://github.com/hiblaphp/event-loop/issues",
+                "source": "https://github.com/hiblaphp/event-loop/tree/main"
             },
-            "time": "2025-09-06T07:07:01+00:00"
+            "time": "2025-09-06T10:56:22+00:00"
         },
         {
-            "name": "fasync/promise",
+            "name": "hiblaphp/promise",
             "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/FAsync/Promise.git",
-                "reference": "22e41d18b602bb6ad341a213b212a74fef9e4303"
+                "url": "https://github.com/hiblaphp/promise.git",
+                "reference": "dc269c4a741003bcff4bc77f6f4053ebebcd2bab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FAsync/Promise/zipball/22e41d18b602bb6ad341a213b212a74fef9e4303",
-                "reference": "22e41d18b602bb6ad341a213b212a74fef9e4303",
+                "url": "https://api.github.com/repos/hiblaphp/promise/zipball/dc269c4a741003bcff4bc77f6f4053ebebcd2bab",
+                "reference": "dc269c4a741003bcff4bc77f6f4053ebebcd2bab",
                 "shasum": ""
             },
             "require": {
-                "fasync/async": "dev-main",
-                "fasync/event-loop": "dev-main",
+                "hiblaphp/async": "dev-main",
+                "hiblaphp/event-loop": "dev-main",
                 "php": "^8.2"
             },
             "require-dev": {
+                "hiblaphp/task": "dev-main",
                 "pestphp/pest": "^4.0"
             },
             "default-branch": true,
@@ -79,7 +83,7 @@
                     "src/Helpers/namespace_functions.php"
                 ],
                 "psr-4": {
-                    "Fasync\\Promise\\": "src/"
+                    "Hibla\\Promise\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -94,10 +98,10 @@
             ],
             "description": "Promise A+ implementation with cancellation support",
             "support": {
-                "issues": "https://github.com/FAsync/Promise/issues",
-                "source": "https://github.com/FAsync/Promise/tree/main"
+                "issues": "https://github.com/hiblaphp/promise/issues",
+                "source": "https://github.com/hiblaphp/promise/tree/main"
             },
-            "time": "2025-09-06T07:06:49+00:00"
+            "time": "2025-09-06T10:56:52+00:00"
         }
     ],
     "packages-dev": [
@@ -3963,8 +3967,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "fasync/event-loop": 20,
-        "fasync/promise": 20
+        "hiblaphp/event-loop": 20,
+        "hiblaphp/promise": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
