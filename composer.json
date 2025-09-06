@@ -1,5 +1,5 @@
 {
-    "name": "fasync/async",
+    "name": "fasyncphp/async",
     "description": "async/await implementation with structured concurrency.",
     "type": "library",
     "license": "MIT",
@@ -24,8 +24,8 @@
     ],
     "require": {
         "php": "^8.2",
-        "fasync/event-loop": "dev-main",
-        "fasync/promise": "dev-main"
+        "fasyncphp/event-loop": "dev-main",
+        "fasyncphp/promise": "dev-main"
     },
     "require-dev": {
         "pestphp/pest": "^4.0"
