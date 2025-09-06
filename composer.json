@@ -1,11 +1,11 @@
 {
-    "name": "fasyncphp/async",
+    "name": "hiblaphp/async",
     "description": "async/await implementation with structured concurrency.",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Fasync\\Async\\": "src/"
+            "Hibla\\Async\\": "src/"
         },
         "files": [
             "src/Helpers/global_functions.php",
@@ -24,8 +24,8 @@
     ],
     "require": {
         "php": "^8.2",
-        "fasyncphp/event-loop": "dev-main",
-        "fasyncphp/promise": "dev-main"
+        "hiblaphp/event-loop": "dev-main",
+        "hiblaphp/promise": "dev-main"
     },
     "require-dev": {
         "pestphp/pest": "^4.0"

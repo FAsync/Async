@@ -1,17 +1,17 @@
 <?php
 
-namespace Fasync\Async;
+namespace Hibla\Async;
 
-use Fasync\Async\Handlers\AsyncExecutionHandler;
-use Fasync\Async\Handlers\AwaitHandler;
-use Fasync\Async\Handlers\ConcurrencyHandler;
-use Fasync\Async\Handlers\FiberContextHandler;
-use Fasync\Async\Handlers\PromiseCollectionHandler;
-use Fasync\Async\Handlers\PromiseHandler;
-use Fasync\Async\Handlers\TimerHandler;
-use Fasync\Async\Interfaces\AsyncOperationsInterface;
-use Fasync\Promise\Interfaces\CancellablePromiseInterface;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Async\Handlers\AsyncExecutionHandler;
+use Hibla\Async\Handlers\AwaitHandler;
+use Hibla\Async\Handlers\ConcurrencyHandler;
+use Hibla\Async\Handlers\FiberContextHandler;
+use Hibla\Async\Handlers\PromiseCollectionHandler;
+use Hibla\Async\Handlers\PromiseHandler;
+use Hibla\Async\Handlers\TimerHandler;
+use Hibla\Async\Interfaces\AsyncOperationsInterface;
+use Hibla\Promise\Interfaces\CancellablePromiseInterface;
+use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
  * High-level interface for asynchronous operations and utilities.

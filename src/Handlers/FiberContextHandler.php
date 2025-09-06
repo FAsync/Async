@@ -1,6 +1,6 @@
 <?php
 
-namespace Fasync\Async\Handlers;
+namespace Hibla\Async\Handlers;
 
 use Fiber;
 use RuntimeException;

@@ -6,9 +6,9 @@
 |--------------------------------------------------------------------------
 */
 
-use Fasync\Async\Async;
-use Fasync\EventLoop\EventLoop;
-use Fasync\Promise\Promise;
+use Hibla\Async\Async;
+use Hibla\EventLoop\EventLoop;
+use Hibla\Promise\Promise;
 
 pest()->extend(Tests\TestCase::class)->in('Feature');
 pest()->extend(Tests\TestCase::class)->in('Unit');

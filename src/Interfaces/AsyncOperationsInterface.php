@@ -1,9 +1,9 @@
 <?php
 
-namespace Fasync\Async\Interfaces;
+namespace Hibla\Async\Interfaces;
 
-use Fasync\Promise\Interfaces\CancellablePromiseInterface;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Promise\Interfaces\CancellablePromiseInterface;
+use Hibla\Promise\Interfaces\PromiseInterface;
 use Throwable;
 
 /**

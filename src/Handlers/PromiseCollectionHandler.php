@@ -1,13 +1,13 @@
 <?php
 
-namespace Fasync\Async\Handlers;
+namespace Hibla\Async\Handlers;
 
 use Exception;
 use InvalidArgumentException;
-use Fasync\Promise\CancellablePromise;
-use Fasync\Promise\Interfaces\CancellablePromiseInterface;
-use Fasync\Promise\Interfaces\PromiseInterface;
-use Fasync\Promise\Promise;
+use Hibla\Promise\CancellablePromise;
+use Hibla\Promise\Interfaces\CancellablePromiseInterface;
+use Hibla\Promise\Interfaces\PromiseInterface;
+use Hibla\Promise\Promise;
 use RuntimeException;
 use Throwable;
 

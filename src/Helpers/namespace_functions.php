@@ -1,11 +1,11 @@
 <?php
 
-namespace Fasync;
+namespace Hibla;
 
-use Fasync\Async\Async;
-use Fasync\Async\Timer;
-use Fasync\Promise\Interfaces\CancellablePromiseInterface;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Async\Async;
+use Hibla\Async\Timer;
+use Hibla\Promise\Interfaces\CancellablePromiseInterface;
+use Hibla\Promise\Interfaces\PromiseInterface;
 
 
 /**

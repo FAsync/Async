@@ -1,9 +1,9 @@
 <?php
 
-namespace Fasync\Async;
+namespace Hibla\Async;
 
-use Fasync\Async\AsyncOperations;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Async\AsyncOperations;
+use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
  * Static API for core asynchronous operations and fiber management.

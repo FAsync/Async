@@ -1,10 +1,10 @@
 <?php
 
-namespace Fasync\Async\Handlers;
+namespace Hibla\Async\Handlers;
 
 use Exception;
 use Fiber;
-use Fasync\Promise\Interfaces\PromiseInterface;
+use Hibla\Promise\Interfaces\PromiseInterface;
 use Throwable;
 
 /**

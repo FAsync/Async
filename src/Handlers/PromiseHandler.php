@@ -1,9 +1,9 @@
 <?php
 
-namespace Fasync\Async\Handlers;
+namespace Hibla\Async\Handlers;
 
-use Fasync\Promise\Interfaces\PromiseInterface;
-use Fasync\Promise\Promise;
+use Hibla\Promise\Interfaces\PromiseInterface;
+use Hibla\Promise\Promise;
 
 /**
  * Handles creation and basic operations on Promise instances.

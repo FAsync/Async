@@ -1,9 +1,9 @@
 <?php
 
-namespace Fasync\Async;
+namespace Hibla\Async;
 
-use Fasync\Promise\Interfaces\PromiseInterface;
-use Fasync\Promise\Promise;
+use Hibla\Promise\Interfaces\PromiseInterface;
+use Hibla\Promise\Promise;
 
 /**
  * A simple, non-reentrant, async-friendly Mutex (Mutual Exclusion lock).

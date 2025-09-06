@@ -1,9 +1,9 @@
 <?php
 
-namespace Fasync\Async;
+namespace Hibla\Async;
 
-use Fasync\Async\AsyncOperations;
-use Fasync\Promise\Interfaces\CancellablePromiseInterface;
+use Hibla\Async\AsyncOperations;
+use Hibla\Promise\Interfaces\CancellablePromiseInterface;
 
 /**
  * Static API for timer-based asynchronous operations.

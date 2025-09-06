@@ -1,10 +1,10 @@
 <?php
 
-namespace Fasync\Async\Handlers;
+namespace Hibla\Async\Handlers;
 
-use Fasync\EventLoop\EventLoop;
-use Fasync\Promise\CancellablePromise;
-use Fasync\Promise\Interfaces\CancellablePromiseInterface;
+use Hibla\EventLoop\EventLoop;
+use Hibla\Promise\CancellablePromise;
+use Hibla\Promise\Interfaces\CancellablePromiseInterface;
 
 /**
  * Handles timer-based asynchronous operations.
