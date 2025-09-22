@@ -178,9 +178,9 @@ final readonly class PromiseCollectionHandler
      * Race multiple Promises and return the first to settle.
      *
      * @param  array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>>  $promises
-     * @return PromiseInterface<mixed>
+     * @return CancellablePromiseInterface<mixed>
      */
-    public function race(array $promises): PromiseInterface
+    public function race(array $promises): CancellablePromiseInterface
     {
         /** @var array<int|string, PromiseInterface<mixed>> $promiseInstances */
         $promiseInstances = [];
@@ -252,7 +252,7 @@ final readonly class PromiseCollectionHandler
 
     /**
      * @param  callable(): PromiseInterface<mixed>|PromiseInterface<mixed>|array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>>  $operations
-     * @return PromiseInterface<mixed>
+     * @return CancellablePromiseInterface<mixed>
      */
     public function timeout(
         callable|PromiseInterface|array $operations,
@@ -264,7 +264,7 @@ final readonly class PromiseCollectionHandler
 
         $items = is_array($operations) ? $operations : [$operations];
         $promises = array_map(
-            fn ($item) => is_callable($item)
+            fn($item) => is_callable($item)
                 ? $this->executionHandler->async($item)()
                 : $item,
             $items
@@ -272,10 +272,9 @@ final readonly class PromiseCollectionHandler
 
         $timeoutPromise = $this->timerHandler
             ->delay($seconds)
-            ->then(fn () => throw new Exception("Operation timed out after {$seconds} seconds"))
-        ;
+            ->then(fn() => throw new Exception("Operation timed out after {$seconds} seconds"));
 
-        /** @var array<int|string, callable(): CancellablePromiseInterface<mixed>|CancellablePromiseInterface<mixed>> $racePromises */
+        /** @var array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>> $racePromises */
         $racePromises = [...$promises, $timeoutPromise];
 
         return $this->race($racePromises);
@@ -285,9 +284,9 @@ final readonly class PromiseCollectionHandler
      * Wait for any Promise in a collection to resolve.
      *
      * @param  array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>>  $promises
-     * @return PromiseInterface<mixed>
+     * @return CancellablePromiseInterface<mixed>
      */
-    public function any(array $promises): PromiseInterface
+    public function any(array $promises): CancellablePromiseInterface
     {
         /** @var array<int|string, PromiseInterface<mixed>> $promiseInstances */
         $promiseInstances = [];

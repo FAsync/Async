@@ -25,7 +25,9 @@
     "require": {
         "php": "^8.2",
         "hiblaphp/event-loop": "dev-main",
-        "hiblaphp/promise": "dev-main"
+        "hiblaphp/promise": "dev-main",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-strict-rules": "^2.0"
     },
     "require-dev": {
         "pestphp/pest": "^4.0"
@@ -34,5 +36,8 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
+    },
+    "scripts": {
+        "analyze": "./vendor/bin/phpstan analyse"
     }
 }

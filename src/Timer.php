@@ -55,7 +55,7 @@ final class Timer
      * in async execution, implementing retry delays, or rate limiting operations.
      *
      * @param  float  $seconds  Number of seconds to delay (supports fractional seconds)
-     * @return CancellablePromiseInterface A promise that resolves with null after the delay
+     * @return CancellablePromiseInterface<null> A promise that resolves with null after the delay
      */
     public static function delay(float $seconds): CancellablePromiseInterface
     {

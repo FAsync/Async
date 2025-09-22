@@ -31,15 +31,16 @@ if (! function_exists('async')) {
      * @param  callable  $asyncFunction  The function to convert to async
      * @return PromiseInterface<mixed> An async version that returns a Promise
      *
-     * @example
-     * $asyncFunc = async(function($data) {
+     * - $asyncFunc = async(function($data) {
      *     $result = await(http_get('https://api.example.com'));
      *     return $result;
      * });
      */
     function async(callable $asyncFunction): PromiseInterface
     {
-        return Async::async($asyncFunction)();
+        /** @var PromiseInterface<mixed> $result */
+        $result = Async::async($asyncFunction)();
+        return $result;
     }
 }
 

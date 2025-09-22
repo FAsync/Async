@@ -39,7 +39,6 @@ final readonly class AwaitHandler
      * @template TValue The type of the resolved value of the promise.
      *
      * @param  PromiseInterface<TValue>  $promise  The promise to await.
-     * @param  bool  $resetEventLoop  Whether to reset the event loop after completion (used when not in Fiber context)
      * @return TValue The resolved value of the promise.
      *
      * @throws Exception|Throwable If the Promise is rejected
