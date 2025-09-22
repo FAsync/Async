@@ -44,11 +44,11 @@ final readonly class AwaitHandler
      *
      * @throws Exception|Throwable If the Promise is rejected
      */
-    public function await(PromiseInterface $promise, bool $resetEventLoop = true): mixed
+    public function await(PromiseInterface $promise): mixed
     {
         // If not in a Fiber context, use the Promise's own await method
         if (!$this->contextHandler->inFiber()) {
-            return $promise->await($resetEventLoop);
+            return $promise->await(false);
         }
 
         $result = null;
