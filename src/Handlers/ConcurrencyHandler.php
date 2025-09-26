@@ -172,7 +172,7 @@ final readonly class ConcurrencyHandler
                 return;
             }
 
-            $concurrency = $concurrency ?? $batchSize;
+            $concurrency ??= $batchSize;
 
             // Preserve original keys and wrap tasks
             $originalKeys = array_keys($tasks);
@@ -227,6 +227,229 @@ final readonly class ConcurrencyHandler
                         $reject($error);
                     })
                 ;
+            };
+
+            EventLoop::getInstance()->nextTick($processNextBatch);
+        });
+    }
+
+    /**
+     * Execute multiple tasks concurrently with a specified concurrency limit and wait for all to settle.
+     *
+     * Similar to concurrent(), but waits for all tasks to complete (either resolve or reject)
+     * and returns settlement results for all tasks. This method never rejects - it always
+     * resolves with an array of settlement results.
+     *
+     * @param  array<int|string, callable(): mixed|PromiseInterface<mixed>>  $tasks  Array of callable tasks or Promise instances
+     * @param  int  $concurrency  Maximum number of tasks to run simultaneously (default: 10)
+     * @return PromiseInterface<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>> Promise that resolves with settlement results
+     */
+    public function concurrentSettled(array $tasks, int $concurrency = 10): PromiseInterface
+    {
+        /** @var Promise<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>> */
+        return new Promise(function (callable $resolve, callable $reject) use ($tasks, $concurrency): void {
+            if ($concurrency <= 0) {
+                $reject(new \InvalidArgumentException('Concurrency limit must be greater than 0'));
+                return;
+            }
+
+            if ($tasks === []) {
+                $resolve([]);
+                return;
+            }
+
+            // Convert tasks to indexed array and preserve original keys
+            $taskList = array_values($tasks);
+            $originalKeys = array_keys($tasks);
+
+            // Process tasks to ensure proper async wrapping
+            $processedTasks = [];
+            foreach ($taskList as $index => $task) {
+                $processedTasks[$index] = $this->wrapTaskForConcurrency($task);
+            }
+
+            $results = [];
+            $running = 0;
+            $completed = 0;
+            $total = count($processedTasks);
+            $taskIndex = 0;
+
+            $processNext = function () use (
+                &$processNext,
+                &$processedTasks,
+                &$originalKeys,
+                &$running,
+                &$completed,
+                &$results,
+                &$total,
+                &$taskIndex,
+                $concurrency,
+                $resolve,
+                $reject
+            ): void {
+                // Start as many tasks as we can up to the concurrency limit
+                while ($running < $concurrency && $taskIndex < $total) {
+                    $currentIndex = $taskIndex++;
+                    $task = $processedTasks[$currentIndex];
+                    $originalKey = $originalKeys[$currentIndex];
+                    $running++;
+
+                    try {
+                        $asyncTask = $this->executionHandler->async($task);
+                        $promise = $asyncTask();
+
+                        if (! ($promise instanceof PromiseInterface)) {
+                            throw new RuntimeException('Task must return a Promise or be a callable that returns a Promise');
+                        }
+                    } catch (Throwable $e) {
+                        // If task creation fails, treat as rejected settlement
+                        $results[$originalKey] = [
+                            'status' => 'rejected',
+                            'reason' => $e,
+                        ];
+                        $running--;
+                        $completed++;
+
+                        if ($completed === $total) {
+                            $resolve($results);
+                            return;
+                        }
+
+                        // Continue processing next task
+                        EventLoop::getInstance()->nextTick($processNext);
+                        return;
+                    }
+
+                    $promise
+                        ->then(function ($result) use (
+                            $originalKey,
+                            &$results,
+                            &$running,
+                            &$completed,
+                            $total,
+                            $resolve,
+                            $processNext
+                        ): void {
+                            $results[$originalKey] = [
+                                'status' => 'fulfilled',
+                                'value' => $result,
+                            ];
+                            $running--;
+                            $completed++;
+
+                            if ($completed === $total) {
+                                $resolve($results);
+                            } else {
+                                // Schedule next task processing on next tick
+                                EventLoop::getInstance()->nextTick($processNext);
+                            }
+                        })
+                        ->catch(function ($error) use (
+                            $originalKey,
+                            &$results,
+                            &$running,
+                            &$completed,
+                            $total,
+                            $resolve,
+                            $processNext
+                        ): void {
+                            $results[$originalKey] = [
+                                'status' => 'rejected',
+                                'reason' => $error,
+                            ];
+                            $running--;
+                            $completed++;
+
+                            if ($completed === $total) {
+                                $resolve($results);
+                            } else {
+                                // Schedule next task processing on next tick
+                                EventLoop::getInstance()->nextTick($processNext);
+                            }
+                        });
+                }
+            };
+
+            // Start initial batch of tasks
+            EventLoop::getInstance()->nextTick($processNext);
+        });
+    }
+
+    /**
+     * Execute tasks in sequential batches with concurrency within each batch and wait for all to settle.
+     *
+     * Similar to batch(), but waits for all tasks to complete (either resolve or reject)
+     * and returns settlement results for all tasks. This method never rejects - it always
+     * resolves with an array of settlement results.
+     *
+     * @param  array<int|string, callable(): mixed|PromiseInterface<mixed>>  $tasks  Array of callable tasks or Promise instances
+     * @param  int  $batchSize  Number of tasks per batch (default: 10)
+     * @param  int|null  $concurrency  Maximum concurrent tasks within each batch (default: same as batch size)
+     * @return PromiseInterface<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>> Promise that resolves with settlement results
+     */
+    public function batchSettled(array $tasks, int $batchSize = 10, ?int $concurrency = null): PromiseInterface
+    {
+        /** @var Promise<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>> */
+        return new Promise(function (callable $resolve, callable $reject) use ($tasks, $batchSize, $concurrency): void {
+            if ($batchSize <= 0) {
+                $reject(new \InvalidArgumentException('Batch size must be greater than 0'));
+                return;
+            }
+
+            if ($tasks === []) {
+                $resolve([]);
+                return;
+            }
+
+            $concurrency ??= $batchSize;
+
+            // Preserve original keys and wrap tasks
+            $originalKeys = array_keys($tasks);
+            $taskValues = array_values($tasks);
+
+            // Process tasks to ensure proper async wrapping
+            $processedTasks = [];
+            foreach ($taskValues as $index => $task) {
+                $processedTasks[$index] = $this->wrapTaskForConcurrency($task);
+            }
+
+            $batches = array_chunk($processedTasks, $batchSize, false);
+            $keyBatches = array_chunk($originalKeys, $batchSize, false);
+
+            $allResults = [];
+            $batchIndex = 0;
+            $totalBatches = count($batches);
+
+            $processNextBatch = function () use (
+                &$processNextBatch,
+                &$batches,
+                &$keyBatches,
+                &$allResults,
+                &$batchIndex,
+                $totalBatches,
+                $concurrency,
+                $resolve
+            ): void {
+                if ($batchIndex >= $totalBatches) {
+                    $resolve($allResults);
+                    return;
+                }
+
+                $currentBatch = $batches[$batchIndex];
+                $currentKeys = $keyBatches[$batchIndex];
+
+                $batchTasks = array_combine($currentKeys, $currentBatch);
+
+                $this->concurrentSettled($batchTasks, $concurrency)
+                    ->then(function ($batchResults) use (
+                        &$allResults,
+                        &$batchIndex,
+                        $processNextBatch
+                    ): void {
+                        $allResults = array_merge($allResults, $batchResults);
+                        $batchIndex++;
+                        EventLoop::getInstance()->nextTick($processNextBatch);
+                    });
             };
 
             EventLoop::getInstance()->nextTick($processNextBatch);

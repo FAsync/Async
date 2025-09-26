@@ -256,4 +256,35 @@ class AsyncOperations implements AsyncOperationsInterface
     {
         return $this->concurrencyHandler->batch($tasks, $batchSize, $concurrency);
     }
+
+    /**
+     * Execute multiple tasks concurrently with a specified concurrency limit and wait for all to settle.
+     *
+     * Similar to concurrent(), but waits for all tasks to complete and returns settlement results.
+     * This method never rejects - it always resolves with an array of settlement results.
+     *
+     * @param  array<int|string, callable(): mixed|PromiseInterface<mixed>>  $tasks  Array of tasks (callables or promises) to execute
+     * @param  int  $concurrency  Maximum number of concurrent executions
+     * @return PromiseInterface<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>> A promise that resolves with settlement results
+     */
+    public function concurrentSettled(array $tasks, int $concurrency = 10): PromiseInterface
+    {
+        return $this->concurrencyHandler->concurrentSettled($tasks, $concurrency);
+    }
+
+    /**
+     * Execute multiple tasks in batches with a concurrency limit and wait for all to settle.
+     *
+     * Similar to batch(), but waits for all tasks to complete and returns settlement results.
+     * This method never rejects - it always resolves with an array of settlement results.
+     *
+     * @param  array<int|string, callable(): mixed|PromiseInterface<mixed>>  $tasks  Array of tasks (callables or promises) to execute
+     * @param  int  $batchSize  Size of each batch to process concurrently
+     * @param  int|null  $concurrency  Maximum number of concurrent executions per batch
+     * @return PromiseInterface<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>> A promise that resolves with settlement results
+     */
+    public function batchSettled(array $tasks, int $batchSize = 10, ?int $concurrency = null): PromiseInterface
+    {
+        return $this->concurrencyHandler->batchSettled($tasks, $batchSize, $concurrency);
+    }
 }
