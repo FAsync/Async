@@ -274,7 +274,12 @@ final readonly class ConcurrencyHandler
                 $processedTasks[$index] = $this->wrapTaskForConcurrency($task);
             }
 
+            // Pre-initialize the results array with all keys to maintain order
             $results = [];
+            foreach ($originalKeys as $key) {
+                $results[$key] = null; // Placeholder to maintain order
+            }
+
             $running = 0;
             $completed = 0;
             $total = count($processedTasks);
@@ -316,7 +321,12 @@ final readonly class ConcurrencyHandler
                         $completed++;
 
                         if ($completed === $total) {
-                            $resolve($results);
+                            // Remove null placeholders and return final results
+                            $finalResults = [];
+                            foreach ($originalKeys as $key) {
+                                $finalResults[$key] = $results[$key];
+                            }
+                            $resolve($finalResults);
                             return;
                         }
 
@@ -331,6 +341,7 @@ final readonly class ConcurrencyHandler
                             &$results,
                             &$running,
                             &$completed,
+                            &$originalKeys,
                             $total,
                             $resolve,
                             $processNext
@@ -343,7 +354,12 @@ final readonly class ConcurrencyHandler
                             $completed++;
 
                             if ($completed === $total) {
-                                $resolve($results);
+                                // Build final results in original order
+                                $finalResults = [];
+                                foreach ($originalKeys as $key) {
+                                    $finalResults[$key] = $results[$key];
+                                }
+                                $resolve($finalResults);
                             } else {
                                 // Schedule next task processing on next tick
                                 EventLoop::getInstance()->nextTick($processNext);
@@ -354,6 +370,7 @@ final readonly class ConcurrencyHandler
                             &$results,
                             &$running,
                             &$completed,
+                            &$originalKeys,
                             $total,
                             $resolve,
                             $processNext
@@ -366,7 +383,12 @@ final readonly class ConcurrencyHandler
                             $completed++;
 
                             if ($completed === $total) {
-                                $resolve($results);
+                                // Build final results in original order
+                                $finalResults = [];
+                                foreach ($originalKeys as $key) {
+                                    $finalResults[$key] = $results[$key];
+                                }
+                                $resolve($finalResults);
                             } else {
                                 // Schedule next task processing on next tick
                                 EventLoop::getInstance()->nextTick($processNext);
@@ -426,7 +448,8 @@ final readonly class ConcurrencyHandler
             $batches = array_chunk($processedTasks, $batchSize, false);
             $keyBatches = array_chunk($originalKeys, $batchSize, false);
 
-            $allResults = [];
+            // Pre-initialize the results array with all keys to maintain order
+            $allResults = array_fill_keys($originalKeys, null);
             $batchIndex = 0;
             $totalBatches = count($batches);
 
@@ -456,7 +479,9 @@ final readonly class ConcurrencyHandler
                         &$batchIndex,
                         $processNextBatch
                     ): void {
-                        $allResults = array_merge($allResults, $batchResults);
+                        foreach ($batchResults as $key => $result) {
+                            $allResults[$key] = $result;
+                        }
                         $batchIndex++;
                         EventLoop::getInstance()->nextTick($processNextBatch);
                     });
