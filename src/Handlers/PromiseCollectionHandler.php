@@ -49,16 +49,27 @@ final readonly class PromiseCollectionHandler
 
             foreach ($promises as $key => $item) {
                 try {
-                    $promise = is_callable($item)
-                        ? $this->executionHandler->async($item)()
-                        : $item;
+                    if (is_callable($item)) {
+                        $promise = $item();
 
-                    if (! ($promise instanceof PromiseInterface)) {
-                        throw new RuntimeException('Item must return a Promise or be a callable that returns a Promise');
+                        if (! ($promise instanceof PromiseInterface)) {
+                            throw new RuntimeException(
+                                "Callable at key '{$key}' must return a PromiseInterface, got " .
+                                    (is_object($promise) ? get_class($promise) : gettype($promise))
+                            );
+                        }
+                    } else {
+                        $promise = $item;
+
+                        if (! ($promise instanceof PromiseInterface)) {
+                            throw new RuntimeException(
+                                "Item at key '{$key}' must be a PromiseInterface or callable that returns a PromiseInterface, got " .
+                                    (is_object($promise) ? get_class($promise) : gettype($promise))
+                            );
+                        }
                     }
                 } catch (Throwable $e) {
                     $reject($e);
-
                     return;
                 }
 
