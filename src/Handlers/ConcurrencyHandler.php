@@ -285,7 +285,6 @@ final readonly class ConcurrencyHandler
                 &$taskIndex,
                 $concurrency,
                 $resolve,
-                $reject
             ): void {
                 // Start as many tasks as we can up to the concurrency limit
                 while ($running < $concurrency && $taskIndex < $total) {
