@@ -1,5 +1,5 @@
 .qodo
 vendor/
-/composer.lock
+composer.lock
 .vscode/
 .env
