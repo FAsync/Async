@@ -174,6 +174,12 @@ final readonly class ConcurrencyHandler
 
             $concurrency ??= $batchSize;
 
+            if ($concurrency <= 0) {
+                $reject(new \InvalidArgumentException('Concurrency limit must be greater than 0'));
+
+                return;
+            }
+
             // Preserve original keys and wrap tasks
             $originalKeys = array_keys($tasks);
             $taskValues = array_values($tasks);
@@ -401,6 +407,11 @@ final readonly class ConcurrencyHandler
             }
 
             $concurrency ??= $batchSize;
+
+            if ($concurrency <= 0) {
+                $reject(new \InvalidArgumentException('Concurrency limit must be greater than 0'));
+                return;
+            }
 
             // Preserve original keys and wrap tasks
             $originalKeys = array_keys($tasks);
