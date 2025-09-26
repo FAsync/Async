@@ -215,12 +215,15 @@ class AsyncOperations implements AsyncOperationsInterface
     }
 
     /**
-     * @param  callable(): PromiseInterface<mixed>|PromiseInterface<mixed>|array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>>  $promises
-     * @return CancellablePromiseInterface<mixed>
+     * Add a timeout to a promise operation.
+     *
+     * @param  PromiseInterface<mixed>  $promise  The promise to add timeout to
+     * @param  float  $seconds  Timeout duration in seconds
+     * @return PromiseInterface<mixed>
      */
-    public function timeout(callable|PromiseInterface|array $promises, float $seconds): CancellablePromiseInterface
+    public function timeout(PromiseInterface $promise, float $seconds): PromiseInterface
     {
-        return $this->collectionHandler->timeout($promises, $seconds);
+        return $this->collectionHandler->timeout($promise, $seconds);
     }
 
     /**

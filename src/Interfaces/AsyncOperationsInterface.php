@@ -108,6 +108,15 @@ interface AsyncOperationsInterface
     public function race(array $promises): PromiseInterface;
 
     /**
+     * Add a timeout to a promise operation.
+     *
+     * @param  PromiseInterface<mixed>  $promise  The promise to add timeout to
+     * @param  float  $seconds  Timeout duration in seconds
+     * @return PromiseInterface<mixed>
+     */
+    public function timeout(PromiseInterface $promise, float $seconds): PromiseInterface;
+
+    /**
      * Executes multiple async tasks with controlled concurrency.
      *
      * Limits the number of simultaneously executing tasks while ensuring

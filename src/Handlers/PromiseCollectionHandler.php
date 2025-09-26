@@ -3,6 +3,7 @@
 namespace Hibla\Async\Handlers;
 
 use Exception;
+use Hibla\Async\Exceptions\TimeoutException;
 use InvalidArgumentException;
 use Hibla\Promise\CancellablePromise;
 use Hibla\Promise\Interfaces\CancellablePromiseInterface;
@@ -251,33 +252,23 @@ final readonly class PromiseCollectionHandler
     }
 
     /**
-     * @param  callable(): PromiseInterface<mixed>|PromiseInterface<mixed>|array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>>  $operations
+     * Add a timeout to a promise operation.
+     *
+     * @param  PromiseInterface<mixed>  $promise  The promise to add timeout to
+     * @param  float  $seconds  Timeout duration in seconds
      * @return CancellablePromiseInterface<mixed>
      */
-    public function timeout(
-        callable|PromiseInterface|array $operations,
-        float $seconds
-    ): CancellablePromiseInterface {
+    public function timeout(PromiseInterface $promise, float $seconds): CancellablePromiseInterface
+    {
         if ($seconds <= 0) {
             throw new InvalidArgumentException('Timeout must be greater than zero');
         }
 
-        $items = is_array($operations) ? $operations : [$operations];
-        $promises = array_map(
-            fn($item) => is_callable($item)
-                ? $this->executionHandler->async($item)()
-                : $item,
-            $items
-        );
-
         $timeoutPromise = $this->timerHandler
             ->delay($seconds)
-            ->then(fn() => throw new Exception("Operation timed out after {$seconds} seconds"));
+            ->then(fn() => throw new TimeoutException($seconds));
 
-        /** @var array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>> $racePromises */
-        $racePromises = [...$promises, $timeoutPromise];
-
-        return $this->race($racePromises);
+        return $this->race([$promise, $timeoutPromise]);
     }
 
     /**
