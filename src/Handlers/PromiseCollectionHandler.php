@@ -93,13 +93,22 @@ final readonly class PromiseCollectionHandler
      * @param  array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>>  $promises
      * @return PromiseInterface<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>>
      */
+    /**
+     * Wait for all promises to settle (either resolve or reject).
+     *
+     * Unlike all(), this method waits for every promise to complete and returns
+     * all results, including both successful values and rejection reasons.
+     * This method never rejects - it always resolves with an array of settlement results.
+     *
+     * @param  array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>>  $promises
+     * @return PromiseInterface<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>>
+     */
     public function allSettled(array $promises): PromiseInterface
     {
         /** @var Promise<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>> */
         return new Promise(function (callable $resolve, callable $reject) use ($promises): void {
             if ($promises === []) {
                 $resolve([]);
-
                 return;
             }
 
@@ -110,15 +119,26 @@ final readonly class PromiseCollectionHandler
 
             foreach ($promises as $key => $item) {
                 try {
-                    $promise = is_callable($item)
-                        ? $this->executionHandler->async($item)()
-                        : $item;
+                    if (is_callable($item)) {
+                        $promise = $item();
 
-                    if (! ($promise instanceof PromiseInterface)) {
-                        throw new RuntimeException('Item must return a Promise or be a callable that returns a Promise');
+                        if (! ($promise instanceof PromiseInterface)) {
+                            throw new RuntimeException(
+                                "Callable at key '{$key}' must return a PromiseInterface, got " .
+                                    (is_object($promise) ? get_class($promise) : gettype($promise))
+                            );
+                        }
+                    } else {
+                        $promise = $item;
+
+                        if (! ($promise instanceof PromiseInterface)) {
+                            throw new RuntimeException(
+                                "Item at key '{$key}' must be a PromiseInterface or callable that returns a PromiseInterface, got " .
+                                    (is_object($promise) ? get_class($promise) : gettype($promise))
+                            );
+                        }
                     }
                 } catch (Throwable $e) {
-                    // If task creation fails, treat as rejected settlement
                     $results[$key] = [
                         'status' => 'rejected',
                         'reason' => $e,
@@ -169,8 +189,7 @@ final readonly class PromiseCollectionHandler
                                 $resolve(array_values($results));
                             }
                         }
-                    })
-                ;
+                    });
             }
         });
     }
