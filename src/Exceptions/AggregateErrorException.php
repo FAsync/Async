@@ -1,5 +1,9 @@
 <?php 
 
+namespace Hibla\Async\Exceptions;
+
+use Exception;
+
 class AggregateErrorException extends Exception
 {
     private array $errors;

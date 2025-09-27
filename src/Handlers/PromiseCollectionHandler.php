@@ -2,8 +2,7 @@
 
 namespace Hibla\Async\Handlers;
 
-use AggregateErrorException;
-use Exception;
+use Hibla\Async\Exceptions\AggregateErrorException;
 use Hibla\Async\Exceptions\TimeoutException;
 use Hibla\Promise\CancellablePromise;
 use Hibla\Promise\Interfaces\CancellablePromiseInterface;

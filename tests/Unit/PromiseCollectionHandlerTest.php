@@ -1,9 +1,9 @@
 <?php
 
+use Hibla\Async\Exceptions\AggregateErrorException;
 use Hibla\Async\Handlers\PromiseCollectionHandler;
 use Hibla\Promise\Promise;
 use Hibla\Async\Exceptions\TimeoutException;
-use Hibla\EventLoop\Loop;
 
 describe('PromiseCollectionHandler', function () {
     beforeEach(function () {
@@ -11,10 +11,13 @@ describe('PromiseCollectionHandler', function () {
     });
 
     it('resolves all promises', function () {
-        $promises = [
-            fn() => (new Promise())->resolve('result1'),
-            fn() => (new Promise())->resolve('result2'),
-        ];
+        $promise1 = new Promise();
+        $promise1->resolve('result1');
+        
+        $promise2 = new Promise();
+        $promise2->resolve('result2');
+        
+        $promises = [$promise1, $promise2];
         
         $promise = $this->handler->all($promises);
         $results = waitForPromise($promise);
@@ -23,10 +26,13 @@ describe('PromiseCollectionHandler', function () {
     });
 
     it('rejects if any promise rejects', function () {
-        $promises = [
-            fn() => (new Promise())->resolve('success'),
-            fn() => (new Promise())->reject(new Exception('failure')),
-        ];
+        $promise1 = new Promise();
+        $promise1->resolve('success');
+        
+        $promise2 = new Promise();
+        $promise2->reject(new Exception('failure'));
+        
+        $promises = [$promise1, $promise2];
         
         $promise = $this->handler->all($promises);
         
@@ -42,25 +48,29 @@ describe('PromiseCollectionHandler', function () {
     });
 
     it('settles all promises', function () {
-        $promises = [
-            fn() => (new Promise())->resolve('success'),
-            fn() => (new Promise())->reject(new Exception('failure')),
-        ];
+        $promise1 = new Promise();
+        $promise1->resolve('success');
+        
+        $promise2 = new Promise();
+        $promise2->reject(new Exception('failure'));
+        
+        $promises = [$promise1, $promise2];
         
         $promise = $this->handler->allSettled($promises);
         $results = waitForPromise($promise);
         
         expect($results)->toHaveCount(2);
         expect($results[0]['status'])->toBe('fulfilled');
+        expect($results[0]['value'])->toBe('success');
         expect($results[1]['status'])->toBe('rejected');
+        expect($results[1]['reason'])->toBeInstanceOf(Exception::class);
     });
 
     it('races promises', function () {
-        $slowPromise = fn() => new Promise(function ($resolve) {
-            \Hibla\EventLoop\EventLoop::getInstance()->addTimer(0.1, fn() => $resolve('slow'));
-        });
+        $fastPromise = new Promise();
+        $fastPromise->resolve('fast');
         
-        $fastPromise = fn() => (new Promise())->resolve('fast');
+        $slowPromise = new Promise(); // Don't resolve this one
         
         $promise = $this->handler->race([$slowPromise, $fastPromise]);
         $result = waitForPromise($promise);
@@ -69,9 +79,7 @@ describe('PromiseCollectionHandler', function () {
     });
 
     it('handles timeout', function () {
-        $slowPromise = new Promise(function ($resolve) {
-            Loop::addTimer(0.2, fn() => $resolve('slow'));
-        });
+        $slowPromise = new Promise(); // Never resolves
         
         $promise = $this->handler->timeout($slowPromise, 0.05);
         
@@ -80,11 +88,16 @@ describe('PromiseCollectionHandler', function () {
     });
 
     it('resolves any promise', function () {
-        $promises = [
-            fn() => (new Promise())->reject(new Exception('fail1')),
-            fn() => (new Promise())->resolve('success'),
-            fn() => (new Promise())->reject(new Exception('fail2')),
-        ];
+        $promise1 = new Promise();
+        $promise1->reject(new Exception('fail1'));
+        
+        $promise2 = new Promise();
+        $promise2->resolve('success');
+        
+        $promise3 = new Promise();
+        $promise3->reject(new Exception('fail2'));
+        
+        $promises = [$promise1, $promise2, $promise3];
         
         $promise = $this->handler->any($promises);
         $result = waitForPromise($promise);
@@ -93,24 +106,27 @@ describe('PromiseCollectionHandler', function () {
     });
 
     it('rejects when all promises reject', function () {
-        $promises = [
-            fn() => (new Promise())->reject(new Exception('fail1')),
-            fn() => (new Promise())->reject(new Exception('fail2')),
-        ];
+        $promise1 = new Promise();
+        $promise1->reject(new Exception('fail1'));
+        
+        $promise2 = new Promise();
+        $promise2->reject(new Exception('fail2'));
+        
+        $promises = [$promise1, $promise2];
         
         $promise = $this->handler->any($promises);
         
         expect(fn() => waitForPromise($promise))
-            ->toThrow(Exception::class, 'All promises rejected');
+            ->toThrow(AggregateErrorException::class, 'All promises were rejected');
     });
 
     it('validates timeout parameter', function () {
         $promise = new Promise();
         
-        expect(fn() => $this->handler->timeout($promise, 0)->await())
+        expect(fn() => $this->handler->timeout($promise, 0))
             ->toThrow(InvalidArgumentException::class, 'Timeout must be greater than zero');
             
-        expect(fn() => $this->handler->timeout($promise, -1)->await())
+        expect(fn() => $this->handler->timeout($promise, -1))
             ->toThrow(InvalidArgumentException::class, 'Timeout must be greater than zero');
     });
 });
