@@ -8,6 +8,8 @@
 
 use Hibla\Async\Async;
 use Hibla\EventLoop\EventLoop;
+use Hibla\Promise\Interfaces\CancellablePromiseInterface;
+use Hibla\Promise\Interfaces\PromiseInterface;
 use Hibla\Promise\Promise;
 
 pest()->extend(Tests\TestCase::class)->in('Feature');
@@ -19,10 +21,28 @@ pest()->extend(Tests\TestCase::class)->in('Unit');
 |--------------------------------------------------------------------------
 */
 
-// Your existing custom expectation is preserved.
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
+expect()->extend('toBePromise', function () {
+    return $this->toBeInstanceOf(PromiseInterface::class);
 });
+
+expect()->extend('toBeCancellablePromise', function () {
+    return $this->toBeInstanceOf(CancellablePromiseInterface::class);
+});
+
+expect()->extend('toBeSettled', function () {
+    $promise = $this->value;
+    
+    if (!($promise instanceof PromiseInterface)) {
+        throw new InvalidArgumentException('Value must be a Promise');
+    }
+    
+    return $this->toBe($promise->isPending());
+});
+
+function waitForPromise(PromiseInterface $promise): mixed
+{    
+    return $promise->await();
+}
 
 /*
 |--------------------------------------------------------------------------
