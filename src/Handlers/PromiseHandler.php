@@ -28,7 +28,7 @@ final readonly class PromiseHandler
     public function resolve(mixed $value): PromiseInterface
     {
         /** @var Promise<TValue> $promise */
-        $promise = new Promise;
+        $promise = new Promise();
         $promise->resolve($value);
 
         return $promise;
@@ -46,7 +46,7 @@ final readonly class PromiseHandler
     public function reject(mixed $reason): PromiseInterface
     {
         /** @var Promise<never> $promise */
-        $promise = new Promise;
+        $promise = new Promise();
         $promise->reject($reason);
 
         return $promise;
@@ -63,7 +63,7 @@ final readonly class PromiseHandler
     public function createEmpty(): PromiseInterface
     {
         /** @var Promise<mixed> $promise */
-        $promise = new Promise;
+        $promise = new Promise();
 
         return $promise;
     }

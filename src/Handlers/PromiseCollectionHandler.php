@@ -4,11 +4,11 @@ namespace Hibla\Async\Handlers;
 
 use Exception;
 use Hibla\Async\Exceptions\TimeoutException;
-use InvalidArgumentException;
 use Hibla\Promise\CancellablePromise;
 use Hibla\Promise\Interfaces\CancellablePromiseInterface;
 use Hibla\Promise\Interfaces\PromiseInterface;
 use Hibla\Promise\Promise;
+use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
 
@@ -22,8 +22,8 @@ final readonly class PromiseCollectionHandler
 
     public function __construct()
     {
-        $this->executionHandler = new AsyncExecutionHandler;
-        $this->timerHandler = new TimerHandler;
+        $this->executionHandler = new AsyncExecutionHandler();
+        $this->timerHandler = new TimerHandler();
     }
 
     /**
@@ -70,6 +70,7 @@ final readonly class PromiseCollectionHandler
                     }
                 } catch (Throwable $e) {
                     $reject($e);
+
                     return;
                 }
 
@@ -120,6 +121,7 @@ final readonly class PromiseCollectionHandler
         return new Promise(function (callable $resolve, callable $reject) use ($promises): void {
             if ($promises === []) {
                 $resolve([]);
+
                 return;
             }
 
@@ -200,7 +202,8 @@ final readonly class PromiseCollectionHandler
                                 $resolve(array_values($results));
                             }
                         }
-                    });
+                    })
+                ;
             }
         });
     }
@@ -296,7 +299,8 @@ final readonly class PromiseCollectionHandler
 
         $timeoutPromise = $this->timerHandler
             ->delay($seconds)
-            ->then(fn() => throw new TimeoutException($seconds));
+            ->then(fn () => throw new TimeoutException($seconds))
+        ;
 
         return $this->race([$promise, $timeoutPromise]);
     }

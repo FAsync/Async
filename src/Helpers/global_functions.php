@@ -40,6 +40,7 @@ if (! function_exists('async')) {
     {
         /** @var PromiseInterface<mixed> $result */
         $result = Async::async($asyncFunction)();
+
         return $result;
     }
 }

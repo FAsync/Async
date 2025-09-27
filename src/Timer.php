@@ -2,7 +2,6 @@
 
 namespace Hibla\Async;
 
-use Hibla\Async\AsyncOperations;
 use Hibla\Promise\Interfaces\CancellablePromiseInterface;
 
 /**
@@ -28,7 +27,7 @@ final class Timer
     private static function getAsyncOperations(): AsyncOperations
     {
         if (self::$asyncOps === null) {
-            self::$asyncOps = new AsyncOperations;
+            self::$asyncOps = new AsyncOperations();
         }
 
         return self::$asyncOps;

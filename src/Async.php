@@ -2,7 +2,6 @@
 
 namespace Hibla\Async;
 
-use Hibla\Async\AsyncOperations;
 use Hibla\Promise\Interfaces\PromiseInterface;
 
 /**
@@ -23,6 +22,7 @@ final class Async
      */
 
     private static ?AsyncOperations $asyncOps = null;
+
     /**
      * Get the singleton instance of AsyncOperations with lazy initialization.
      *
@@ -31,7 +31,7 @@ final class Async
     protected static function getAsyncOperations(): AsyncOperations
     {
         if (self::$asyncOps === null) {
-            self::$asyncOps = new AsyncOperations;
+            self::$asyncOps = new AsyncOperations();
         }
 
         return self::$asyncOps;

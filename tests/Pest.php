@@ -42,4 +42,3 @@ function resetEventLoop()
     Async::reset();
     Promise::reset();
 }
-

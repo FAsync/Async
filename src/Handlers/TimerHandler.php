@@ -20,7 +20,7 @@ final readonly class TimerHandler
     public function delay(float $seconds): CancellablePromiseInterface
     {
         /** @var CancellablePromise<null> $promise */
-        $promise = new CancellablePromise;
+        $promise = new CancellablePromise();
 
         $timerId = EventLoop::getInstance()->addTimer($seconds, function () use ($promise): void {
             if (! $promise->isCancelled()) {

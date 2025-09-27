@@ -46,7 +46,7 @@ final readonly class AwaitHandler
     public function await(PromiseInterface $promise): mixed
     {
         // If not in a Fiber context, use the Promise's own await method
-        if (!$this->contextHandler->inFiber()) {
+        if (! $this->contextHandler->inFiber()) {
             return $promise->await(false);
         }
 

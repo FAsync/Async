@@ -7,7 +7,6 @@ use Hibla\Async\Timer;
 use Hibla\Promise\Interfaces\CancellablePromiseInterface;
 use Hibla\Promise\Interfaces\PromiseInterface;
 
-
 /**
  * Check if the current execution context is within a PHP Fiber.
  *
@@ -20,8 +19,6 @@ function in_fiber(): bool
 {
     return Async::inFiber();
 }
-
-
 
 /**
  * Convert a regular function into an async function that returns a Promise.
@@ -42,9 +39,9 @@ function async(callable $asyncFunction): PromiseInterface
 {
     /** @var PromiseInterface<mixed> $result */
     $result = Async::async($asyncFunction)();
+
     return $result;
 }
-
 
 /**
  * Suspends the current fiber until the promise is fulfilled or rejected.
@@ -64,7 +61,6 @@ function await(PromiseInterface $promise): mixed
 {
     return Async::await($promise);
 }
-
 
 /**
  * Create a promise that resolves after a specified time delay.

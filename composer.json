@@ -25,12 +25,13 @@
     "require": {
         "php": "^8.2",
         "hiblaphp/event-loop": "dev-main",
-        "hiblaphp/promise": "dev-main",
-        "phpstan/phpstan": "^2.1",
-        "phpstan/phpstan-strict-rules": "^2.0"
+        "hiblaphp/promise": "dev-main"
     },
     "require-dev": {
-        "pestphp/pest": "^4.0"
+        "pestphp/pest": "^4.0",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "laravel/pint": "^1.25"
     },
     "config": {
         "allow-plugins": {
@@ -38,6 +39,9 @@
         }
     },
     "scripts": {
-        "analyze": "./vendor/bin/phpstan analyse"
+        "analyze": "./vendor/bin/phpstan analyse",
+        "format": "./vendor/bin/pint",
+        "format-test": "./vendor/bin/pint --test",
+        "test": "./vendor/bin/pest"
     }
 }

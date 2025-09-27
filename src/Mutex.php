@@ -40,7 +40,7 @@ class Mutex
      */
     public function __construct()
     {
-        $this->queue = new \SplQueue;
+        $this->queue = new \SplQueue();
     }
 
     /**
@@ -67,7 +67,7 @@ class Mutex
 
         // Mutex is locked, create a pending promise and queue it
         /** @var Promise<$this> $promise */
-        $promise = new Promise;
+        $promise = new Promise();
         $this->queue->enqueue($promise);
 
         return $promise;
