@@ -2,6 +2,7 @@
 
 use Hibla\Async\Exceptions\AggregateErrorException;
 use Hibla\Async\Exceptions\TimeoutException;
+use Hibla\Promise\Interfaces\PromiseInterface;
 use Hibla\Promise\Promise;
 
 beforeEach(function () {
@@ -17,7 +18,7 @@ describe('Promise Static Methods Integration', function () {
         it('creates resolved promises', function () {
             $promise = Promise::resolved('test value');
 
-            expect($promise)->toBePromise();
+            expect($promise)->toBeInstanceOf(PromiseInterface::class);
             expect($promise->isResolved())->toBeTrue();
             expect($promise->getValue())->toBe('test value');
 
@@ -29,7 +30,7 @@ describe('Promise Static Methods Integration', function () {
             $error = new RuntimeException('test error');
             $promise = Promise::rejected($error);
 
-            expect($promise)->toBePromise();
+            expect($promise)->toBeInstanceOf(PromiseInterface::class);
             expect($promise->isRejected())->toBeTrue();
             expect($promise->getReason())->toBe($error);
 
@@ -420,9 +421,9 @@ describe('Promise Static Methods Integration', function () {
             $tasks = [];
             for ($i = 0; $i < 5; $i++) {
                 $tasks[] = async(function () use ($i) {
-                        await(delay(0.1));
-                        return "task-$i";
-                    });
+                    await(delay(0.1));
+                    return "task-$i";
+                });
             }
 
             $promise = Promise::concurrent($tasks);
