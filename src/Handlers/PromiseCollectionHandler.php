@@ -38,23 +38,33 @@ final readonly class PromiseCollectionHandler
         return new Promise(function (callable $resolve, callable $reject) use ($promises): void {
             if ($promises === []) {
                 $resolve([]);
-
                 return;
             }
 
-            $results = [];
-            $completed = 0;
-            $total = count($promises);
+            $originalKeys = array_keys($promises);
             $hasStringKeys = $this->hasStringKeys($promises);
 
-            foreach ($promises as $key => $item) {
+            // Pre-initialize results array to maintain order
+            $results = [];
+            if ($hasStringKeys) {
+                foreach ($originalKeys as $key) {
+                    $results[$key] = null;
+                }
+            } else {
+                $results = array_fill(0, count($promises), null);
+            }
+
+            $completed = 0;
+            $total = count($promises);
+
+            foreach ($promises as $index => $item) {
                 try {
                     if (is_callable($item)) {
                         $promise = $item();
 
                         if (! ($promise instanceof PromiseInterface)) {
                             throw new RuntimeException(
-                                "Callable at key '{$key}' must return a PromiseInterface, got " .
+                                "Callable at key '{$index}' must return a PromiseInterface, got " .
                                     (is_object($promise) ? get_class($promise) : gettype($promise))
                             );
                         }
@@ -63,34 +73,35 @@ final readonly class PromiseCollectionHandler
 
                         if (! ($promise instanceof PromiseInterface)) {
                             throw new RuntimeException(
-                                "Item at key '{$key}' must be a PromiseInterface or callable that returns a PromiseInterface, got " .
+                                "Item at key '{$index}' must be a PromiseInterface or callable that returns a PromiseInterface, got " .
                                     (is_object($promise) ? get_class($promise) : gettype($promise))
                             );
                         }
                     }
                 } catch (Throwable $e) {
                     $reject($e);
-
                     return;
                 }
 
+                // Find the position for indexed arrays
+                $resultIndex = $hasStringKeys ? $index : array_search($index, $originalKeys, true);
+
                 $promise
-                    ->then(function ($value) use (&$results, &$completed, $total, $key, $resolve, $hasStringKeys): void {
-                        $results[$key] = $value;
+                    ->then(function ($value) use (&$results, &$completed, $total, $index, $resultIndex, $resolve, $hasStringKeys): void {
+                        if ($hasStringKeys) {
+                            $results[$index] = $value;
+                        } else {
+                            $results[$resultIndex] = $value;
+                        }
+
                         $completed++;
                         if ($completed === $total) {
-                            if ($hasStringKeys) {
-                                $resolve($results);
-                            } else {
-                                ksort($results);
-                                $resolve(array_values($results));
-                            }
+                            $resolve($results);
                         }
                     })
                     ->catch(function ($reason) use ($reject): void {
                         $reject($reason);
-                    })
-                ;
+                    });
             }
         });
     }
@@ -121,23 +132,36 @@ final readonly class PromiseCollectionHandler
         return new Promise(function (callable $resolve) use ($promises): void {
             if ($promises === []) {
                 $resolve([]);
-
                 return;
             }
 
-            $results = [];
-            $completed = 0;
-            $total = count($promises);
+            $originalKeys = array_keys($promises);
             $hasStringKeys = $this->hasStringKeys($promises);
 
-            foreach ($promises as $key => $item) {
+            // Pre-initialize results array to maintain order
+            $results = [];
+            if ($hasStringKeys) {
+                foreach ($originalKeys as $key) {
+                    $results[$key] = null;
+                }
+            } else {
+                $results = array_fill(0, count($promises), null);
+            }
+
+            $completed = 0;
+            $total = count($promises);
+
+            foreach ($promises as $index => $item) {
+                // Find the position for indexed arrays
+                $resultIndex = $hasStringKeys ? $index : array_search($index, $originalKeys, true);
+
                 try {
                     if (is_callable($item)) {
                         $promise = $item();
 
                         if (! ($promise instanceof PromiseInterface)) {
                             throw new RuntimeException(
-                                "Callable at key '{$key}' must return a PromiseInterface, got " .
+                                "Callable at key '{$index}' must return a PromiseInterface, got " .
                                     (is_object($promise) ? get_class($promise) : gettype($promise))
                             );
                         }
@@ -146,64 +170,72 @@ final readonly class PromiseCollectionHandler
 
                         if (! ($promise instanceof PromiseInterface)) {
                             throw new RuntimeException(
-                                "Item at key '{$key}' must be a PromiseInterface or callable that returns a PromiseInterface, got " .
+                                "Item at key '{$index}' must be a PromiseInterface or callable that returns a PromiseInterface, got " .
                                     (is_object($promise) ? get_class($promise) : gettype($promise))
                             );
                         }
                     }
                 } catch (Throwable $e) {
-                    $results[$key] = [
-                        'status' => 'rejected',
-                        'reason' => $e,
-                    ];
+                    if ($hasStringKeys) {
+                        $results[$index] = [
+                            'status' => 'rejected',
+                            'reason' => $e,
+                        ];
+                    } else {
+                        $results[$resultIndex] = [
+                            'status' => 'rejected',
+                            'reason' => $e,
+                        ];
+                    }
+
                     $completed++;
 
                     if ($completed === $total) {
-                        if ($hasStringKeys) {
-                            $resolve($results);
-                        } else {
-                            ksort($results);
-                            $resolve(array_values($results));
-                        }
+                        $resolve($results);
                     }
 
                     continue;
                 }
 
                 $promise
-                    ->then(function ($value) use (&$results, &$completed, $total, $key, $resolve, $hasStringKeys): void {
-                        $results[$key] = [
-                            'status' => 'fulfilled',
-                            'value' => $value,
-                        ];
+                    ->then(function ($value) use (&$results, &$completed, $total, $index, $resultIndex, $resolve, $hasStringKeys): void {
+                        if ($hasStringKeys) {
+                            $results[$index] = [
+                                'status' => 'fulfilled',
+                                'value' => $value,
+                            ];
+                        } else {
+                            $results[$resultIndex] = [
+                                'status' => 'fulfilled',
+                                'value' => $value,
+                            ];
+                        }
+
                         $completed++;
 
                         if ($completed === $total) {
-                            if ($hasStringKeys) {
-                                $resolve($results);
-                            } else {
-                                ksort($results);
-                                $resolve(array_values($results));
-                            }
+                            $resolve($results);
                         }
                     })
-                    ->catch(function ($reason) use (&$results, &$completed, $total, $key, $resolve, $hasStringKeys): void {
-                        $results[$key] = [
-                            'status' => 'rejected',
-                            'reason' => $reason,
-                        ];
+                    ->catch(function ($reason) use (&$results, &$completed, $total, $index, $resultIndex, $resolve, $hasStringKeys): void {
+                        if ($hasStringKeys) {
+                            $results[$index] = [
+                                'status' => 'rejected',
+                                'reason' => $reason,
+                            ];
+                        } else {
+                            $results[$resultIndex] = [
+                                'status' => 'rejected',
+                                'reason' => $reason,
+                            ];
+                        }
+
                         $completed++;
 
                         if ($completed === $total) {
-                            if ($hasStringKeys) {
-                                $resolve($results);
-                            } else {
-                                ksort($results);
-                                $resolve(array_values($results));
-                            }
+                            $resolve($results);
                         }
-                    })
-                ;
+                    });
             }
         });
     }
