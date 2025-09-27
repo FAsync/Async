@@ -2,6 +2,7 @@
 
 namespace Hibla\Async\Handlers;
 
+use AggregateErrorException;
 use Exception;
 use Hibla\Async\Exceptions\TimeoutException;
 use Hibla\Promise\CancellablePromise;
@@ -118,7 +119,7 @@ final readonly class PromiseCollectionHandler
     public function allSettled(array $promises): PromiseInterface
     {
         /** @var Promise<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>> */
-        return new Promise(function (callable $resolve, callable $reject) use ($promises): void {
+        return new Promise(function (callable $resolve) use ($promises): void {
             if ($promises === []) {
                 $resolve([]);
 
@@ -222,8 +223,7 @@ final readonly class PromiseCollectionHandler
 
         $cancellablePromise = new CancellablePromise(function (callable $resolve, callable $reject) use ($promises, &$promiseInstances, &$settled): void {
             if ($promises === []) {
-                $reject(new Exception('No promises provided'));
-
+                $reject(new InvalidArgumentException('Cannot race with no promises provided'));
                 return;
             }
 
@@ -249,7 +249,6 @@ final readonly class PromiseCollectionHandler
                         $this->cancelPromiseIfPossible($p);
                     }
                     $reject($e);
-
                     return;
                 }
 
@@ -269,8 +268,7 @@ final readonly class PromiseCollectionHandler
 
                         $this->handleRaceSettlement($settled, $promiseInstances, $index);
                         $reject($reason);
-                    })
-                ;
+                    });
             }
         });
 
@@ -299,8 +297,7 @@ final readonly class PromiseCollectionHandler
 
         $timeoutPromise = $this->timerHandler
             ->delay($seconds)
-            ->then(fn () => throw new TimeoutException($seconds))
-        ;
+            ->then(fn() => throw new TimeoutException($seconds));
 
         return $this->race([$promise, $timeoutPromise]);
     }
@@ -320,8 +317,7 @@ final readonly class PromiseCollectionHandler
         $cancellablePromise = new CancellablePromise(
             function (callable $resolve, callable $reject) use ($promises, &$promiseInstances, &$settled): void {
                 if ($promises === []) {
-                    $reject(new Exception('No promises provided'));
-
+                    $reject(new AggregateErrorException([], 'No promises provided'));
                     return;
                 }
 
@@ -353,7 +349,6 @@ final readonly class PromiseCollectionHandler
                             $this->cancelPromiseIfPossible($p);
                         }
                         $reject($e);
-
                         return;
                     }
 
@@ -386,18 +381,10 @@ final readonly class PromiseCollectionHandler
 
                                 if ($rejectedCount === $total) {
                                     $settled = true;
-                                    $rejectionsJson = json_encode($rejections);
-                                    $reject(
-                                        new Exception(
-                                            'All promises rejected',
-                                            0,
-                                            new Exception($rejectionsJson !== false ? $rejectionsJson : 'Failed to encode rejections')
-                                        )
-                                    );
+                                    $reject(new AggregateErrorException($rejections, 'All promises were rejected'));
                                 }
                             }
-                        )
-                    ;
+                        );
                 }
             }
         );
