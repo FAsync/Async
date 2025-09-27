@@ -12,9 +12,9 @@ $concurrencyHandler = new ConcurrencyHandler(new AsyncExecutionHandler);
 
 // Test with array keys
 $promise = [
-    'first' => Timer::delay(0.01)->then(fn() => 'first_value'),  
-    'second' => Timer::delay(0.02)->then(fn() => 'second_value'), 
-    'third' => Timer::delay(0.005)->then(fn() => 'third_value')  
+    5 => Timer::delay(0.01)->then(fn() => 'first_value'),
+    10 => Timer::delay(0.02)->then(fn() => 'second_value'),
+    15 => Timer::delay(0.005)->then(fn() => 'third_value')
 ];
 
 $results = await($concurrencyHandler->concurrent($promise));
@@ -24,9 +24,9 @@ print_r($results);
 
 // Test without array keys
 $promiseNoKeys = [
-    Timer::delay(0.01)->then(fn() => 'first_value'),  
-    Timer::delay(0.02)->then(fn() => 'second_value'), 
-    Timer::delay(0.005)->then(fn() => 'third_value')  
+    Timer::delay(0.01)->then(fn() => 'first_value'),
+    Timer::delay(0.02)->then(fn() => 'second_value'),
+    Timer::delay(0.005)->then(fn() => 'third_value')
 ];
 
 $results = await($concurrencyHandler->concurrent($promiseNoKeys));
@@ -36,9 +36,9 @@ print_r($results);
 
 // Batch with keys
 $anotherPromise = [
-    'first' => Timer::delay(0.01)->then(fn() => 'first_value'),  
-    'second' => Timer::delay(0.02)->then(fn() => 'second_value'), 
-    'third' => Timer::delay(0.005)->then(fn() => 'third_value')  
+    5 => Timer::delay(0.01)->then(fn() => 'first_value'),
+    10 => Timer::delay(0.02)->then(fn() => 'second_value'),
+    15 => Timer::delay(0.005)->then(fn() => 'third_value')
 ];
 
 $results = await($concurrencyHandler->batch($anotherPromise));
@@ -48,9 +48,9 @@ print_r($results);
 
 // Batch without keys
 $anotherPromiseNoKeys = [
-    Timer::delay(0.01)->then(fn() => 'first_value'),  
-    Timer::delay(0.02)->then(fn() => 'second_value'), 
-    Timer::delay(0.005)->then(fn() => 'third_value')  
+    Timer::delay(0.01)->then(fn() => 'first_value'),
+    Timer::delay(0.02)->then(fn() => 'second_value'),
+    Timer::delay(0.005)->then(fn() => 'third_value')
 ];
 
 $results = await($concurrencyHandler->batch($anotherPromiseNoKeys));
@@ -60,9 +60,9 @@ print_r($results);
 
 // Collection all with keys
 $yetAnotherPromise = [
-    'first' => Timer::delay(0.01)->then(fn() => 'first_value'),  
-    'second' => Timer::delay(0.02)->then(fn() => 'second_value'), 
-    'third' => Timer::delay(0.005)->then(fn() => 'third_value')  
+    5 =>  Timer::delay(0.01)->then(fn() => 'first_value'),
+    10 =>  Timer::delay(0.02)->then(fn() => 'second_value'),
+    15 =>  Timer::delay(0.005)->then(fn() => 'third_value')
 ];
 
 $results = await($collection->all($yetAnotherPromise));
@@ -72,9 +72,9 @@ print_r($results);
 
 // Collection all without keys
 $yetAnotherPromiseNoKeys = [
-    Timer::delay(0.01)->then(fn() => 'first_value'),  
-    Timer::delay(0.02)->then(fn() => 'second_value'), 
-    Timer::delay(0.005)->then(fn() => 'third_value')  
+    Timer::delay(0.01)->then(fn() => 'first_value'),
+    Timer::delay(0.02)->then(fn() => 'second_value'),
+    Timer::delay(0.005)->then(fn() => 'third_value')
 ];
 
 $results = await($collection->all($yetAnotherPromiseNoKeys));

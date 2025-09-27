@@ -42,11 +42,11 @@ final readonly class PromiseCollectionHandler
             }
 
             $originalKeys = array_keys($promises);
-            $hasStringKeys = $this->hasStringKeys($promises);
+            $shouldPreserveKeys = $this->shouldPreserveKeys($promises);
 
             // Pre-initialize results array to maintain order
             $results = [];
-            if ($hasStringKeys) {
+            if ($shouldPreserveKeys) {
                 foreach ($originalKeys as $key) {
                     $results[$key] = null;
                 }
@@ -83,12 +83,12 @@ final readonly class PromiseCollectionHandler
                     return;
                 }
 
-                // Find the position for indexed arrays
-                $resultIndex = $hasStringKeys ? $index : array_search($index, $originalKeys, true);
+                // Use original key if preserving keys, otherwise use sequential position
+                $resultIndex = $shouldPreserveKeys ? $index : array_search($index, $originalKeys, true);
 
                 $promise
-                    ->then(function ($value) use (&$results, &$completed, $total, $index, $resultIndex, $resolve, $hasStringKeys): void {
-                        if ($hasStringKeys) {
+                    ->then(function ($value) use (&$results, &$completed, $total, $index, $resultIndex, $resolve, $shouldPreserveKeys): void {
+                        if ($shouldPreserveKeys) {
                             $results[$index] = $value;
                         } else {
                             $results[$resultIndex] = $value;
@@ -116,16 +116,6 @@ final readonly class PromiseCollectionHandler
      * @param  array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>>  $promises
      * @return PromiseInterface<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>>
      */
-    /**
-     * Wait for all promises to settle (either resolve or reject).
-     *
-     * Unlike all(), this method waits for every promise to complete and returns
-     * all results, including both successful values and rejection reasons.
-     * This method never rejects - it always resolves with an array of settlement results.
-     *
-     * @param  array<int|string, callable(): PromiseInterface<mixed>|PromiseInterface<mixed>>  $promises
-     * @return PromiseInterface<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>>
-     */
     public function allSettled(array $promises): PromiseInterface
     {
         /** @var Promise<array<int|string, array{status: 'fulfilled'|'rejected', value?: mixed, reason?: mixed}>> */
@@ -136,11 +126,11 @@ final readonly class PromiseCollectionHandler
             }
 
             $originalKeys = array_keys($promises);
-            $hasStringKeys = $this->hasStringKeys($promises);
+            $shouldPreserveKeys = $this->shouldPreserveKeys($promises);
 
             // Pre-initialize results array to maintain order
             $results = [];
-            if ($hasStringKeys) {
+            if ($shouldPreserveKeys) {
                 foreach ($originalKeys as $key) {
                     $results[$key] = null;
                 }
@@ -152,8 +142,8 @@ final readonly class PromiseCollectionHandler
             $total = count($promises);
 
             foreach ($promises as $index => $item) {
-                // Find the position for indexed arrays
-                $resultIndex = $hasStringKeys ? $index : array_search($index, $originalKeys, true);
+                // Use original key if preserving keys, otherwise use sequential position
+                $resultIndex = $shouldPreserveKeys ? $index : array_search($index, $originalKeys, true);
 
                 try {
                     if (is_callable($item)) {
@@ -176,7 +166,7 @@ final readonly class PromiseCollectionHandler
                         }
                     }
                 } catch (Throwable $e) {
-                    if ($hasStringKeys) {
+                    if ($shouldPreserveKeys) {
                         $results[$index] = [
                             'status' => 'rejected',
                             'reason' => $e,
@@ -198,8 +188,8 @@ final readonly class PromiseCollectionHandler
                 }
 
                 $promise
-                    ->then(function ($value) use (&$results, &$completed, $total, $index, $resultIndex, $resolve, $hasStringKeys): void {
-                        if ($hasStringKeys) {
+                    ->then(function ($value) use (&$results, &$completed, $total, $index, $resultIndex, $resolve, $shouldPreserveKeys): void {
+                        if ($shouldPreserveKeys) {
                             $results[$index] = [
                                 'status' => 'fulfilled',
                                 'value' => $value,
@@ -217,8 +207,8 @@ final readonly class PromiseCollectionHandler
                             $resolve($results);
                         }
                     })
-                    ->catch(function ($reason) use (&$results, &$completed, $total, $index, $resultIndex, $resolve, $hasStringKeys): void {
-                        if ($hasStringKeys) {
+                    ->catch(function ($reason) use (&$results, &$completed, $total, $index, $resultIndex, $resolve, $shouldPreserveKeys): void {
+                        if ($shouldPreserveKeys) {
                             $results[$index] = [
                                 'status' => 'rejected',
                                 'reason' => $reason,
@@ -478,10 +468,22 @@ final readonly class PromiseCollectionHandler
     }
 
     /**
+     * Determine if array keys should be preserved in the result.
+     * Returns true for string keys or non-sequential numeric keys.
+     *
      * @param  array<int|string, mixed>  $array
      */
-    private function hasStringKeys(array $array): bool
+    private function shouldPreserveKeys(array $array): bool
     {
-        return count(array_filter(array_keys($array), 'is_string')) > 0;
+        $keys = array_keys($array);
+
+        // If any key is a string, preserve keys
+        if (count(array_filter($keys, 'is_string')) > 0) {
+            return true;
+        }
+
+        // If numeric keys are not sequential starting from 0, preserve them
+        $expectedKeys = range(0, count($array) - 1);
+        return $keys !== $expectedKeys;
     }
 }
